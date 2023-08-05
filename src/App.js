@@ -20,23 +20,47 @@ function App() {
   // ];
 
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const fetchMoviesHandler = () => {
-    fetch("https://swapi.dev/api/films/")
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        const transformdata = data.results.map((moviesData) => {
-          return {
-            id: moviesData.episode_id,
-            title: moviesData.title,
-            openingText: moviesData.opening_crawl,
-            releaseDate: moviesData.release_date,
-          };
-        });
-        setMovies(transformdata);
+  // const fetchMoviesHandler = () => {
+  //   fetch("https://swapi.dev/api/films/")
+  //     .then((res) => {
+  //       return res.json();
+  //     })
+  //     .then((data) => {
+  //       console.log(data);
+
+  //       const transformdata = data.results.map((moviesData) => {
+  //         return {
+  //           id: moviesData.episode_id,
+  //           title: moviesData.title,
+  //           openingText: moviesData.opening_crawl,
+  //           releaseDate: moviesData.release_date,
+  //         };
+  //       });
+  //       setMovies(transformdata);
+  //     });
+  // };
+
+  const fetchMoviesHandler = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("https://swapi.dev/api/films/");
+      const data = await res.json();
+
+      const transformdata = data.results.map((moviesData) => {
+        return {
+          id: moviesData.episode_id,
+          title: moviesData.title,
+          openingText: moviesData.opening_crawl,
+          releaseDate: moviesData.release_date,
+        };
       });
+      setMovies(transformdata);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -45,7 +69,9 @@ function App() {
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
       <section>
-        <MoviesList movies={movies} />
+        {!loading && <MoviesList movies={movies} />}
+        {!loading && movies.length === 0 && <p>Found No Movies..</p>}
+        {loading && <p>Loading...</p>}
       </section>
     </React.Fragment>
   );
