@@ -23,7 +23,7 @@ function App() {
 
       const data = await response.json();
 
-      const loadMovies = [];
+      let loadMovies = [];
 
       for (const key in data) {
         loadMovies.push({
@@ -35,6 +35,7 @@ function App() {
       }
 
       console.log(data);
+      console.log(loadMovies);
 
       setMovies(loadMovies);
     } catch (error) {
@@ -58,13 +59,29 @@ function App() {
         },
       }
     );
-    const data = await res.json();
+    // const data = await res.json();
+  }
+
+  async function deletehandler(id) {
+    await fetch(
+      `https://datafetcheapp-default-rtdb.firebaseio.com/movies/${id}.json`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    setMovies((prevState) => {
+      let updatedList = prevState.filter((item) => item.id !== id);
+      return updatedList;
+    });
   }
 
   let content = <p>Found no movies.</p>;
 
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} />;
+    content = <MoviesList movies={movies} ondeletehandler={deletehandler} />;
   }
 
   if (error) {
